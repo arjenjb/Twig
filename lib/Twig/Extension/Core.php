@@ -171,8 +171,8 @@ class Twig_Extension_Core extends Twig_Extension
         );
 
         if (function_exists('mb_get_info')) {
-            $filters['upper'] = new Twig_Filter_Function('twig_upper_filter', array('needs_environment' => true));
-            $filters['lower'] = new Twig_Filter_Function('twig_lower_filter', array('needs_environment' => true));
+            $filters[] = new Twig_SimpleFilter('upper', 'twig_upper_filter', array('needs_environment' => true));
+            $filters[] = new Twig_SimpleFilter('lower', 'twig_lower_filter', array('needs_environment' => true));
         }
 
         return $filters;
@@ -515,15 +515,19 @@ function twig_number_format_filter(Twig_Environment $env, $number, $decimal = nu
 }
 
 /**
- * URL encodes a string.
+ * URL encodes a string as a path segment or an array as a query string.
  *
- * @param string $url A URL
- * @param bool   $raw true to use rawurlencode() instead of urlencode
+ * @param string|array $url A URL or an array of query parameters
+ * @param bool         $raw true to use rawurlencode() instead of urlencode
  *
  * @return string The URL encoded value
  */
 function twig_urlencode_filter($url, $raw = false)
 {
+    if (is_array($url)) {
+        return http_build_query($url, '', '&');
+    }
+
     if ($raw) {
         return rawurlencode($url);
     }
@@ -1324,13 +1328,16 @@ function twig_array_batch($items, $size, $fill = null)
         $items = iterator_to_array($items, false);
     }
 
+    $size = ceil($size);
+
     $result = array_chunk($items, $size, true);
 
     if (null !== $fill) {
         $last = count($result) - 1;
-        while (count($result[$last]) < $size) {
-            $result[$last][] = $fill;
-        }
+        $result[$last] = array_merge(
+            $result[$last],
+            array_fill(0, $size - count($result[$last]), $fill)
+        );
     }
 
     return $result;

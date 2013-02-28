@@ -1,7 +1,7 @@
 --TEST--
 "batch" filter
 --TEMPLATE--
-{% for row in items|batch(3) %}
+{% for row in items|batch(3.1) %}
   <div class=row>
   {% for column in row %}
     <div class=item>{{ column }}</div>
