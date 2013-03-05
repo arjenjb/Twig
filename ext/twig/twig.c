@@ -302,7 +302,7 @@ zval *TWIG_GET_ARRAY_ELEMENT(zval *class, char *prop_name, int prop_name_length 
 {
 	zval **tmp_zval;
 
-	if (class == NULL/* || Z_TYPE_P(class) != IS_ARRAY*/) {
+	if (class == NULL) {
 		return NULL;
 	}
 
